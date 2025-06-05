@@ -1,0 +1,37 @@
+function findlineshv(I)
+
+% Read Image
+img = imread(I);
+
+% Convert to black and white because
+% edge function only works with BW imgs
+bwImage = rgb2gray(img);
+
+% figure(1),imshow(bwImage);
+
+% find edges using edge function
+b=edge(bwImage,'sobel');
+
+% show edges
+% figure(1),imshow(b);
+
+
+% compute the Hough transform of the edges found
+% by the edge function
+[hou,theta,rho] = hough(b);
+
+% define peaks, x and y
+peaks = houghpeaks(hou,5,'threshold',ceil(0.3*max(hou(:))));
+
+x = theta(peaks(:,2));
+y = rho(peaks(:,1));
+
+
+lines = houghlines(bwImage,theta,rho,peaks,'FillGap',5,'MinLength',7);
+
+figure, imshow(bwImage), hold on
+
+for k = 1:length(lines)
+    xy = [lines(k).point1; lines(k).point2];
+    plot(xy(:,1),xy(:,2),'LineWidth',3,'Color','red');
+end
